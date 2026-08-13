@@ -3,181 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>关于我 — 从物理到影像</title>
+<title>关于我 — 物理学习法</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-body {
-  font-family:'Inter','Noto Serif SC',serif; background:#0a0a0f; color:#e8e6e3;
-  line-height:1.7; overflow-x:hidden;
-}
-::selection { background:#d4a853; color:#0a0a0f; }
-::-webkit-scrollbar { width:6px; }
-::-webkit-scrollbar-track { background:#0a0a0f; }
-::-webkit-scrollbar-thumb { background:#d4a85333; border-radius:3px; }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter','Noto Serif SC',serif;background:#0b0e14;color:#dfe2ea;line-height:1.7;overflow-x:hidden}
+::selection{background:#3b82f6;color:#fff}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0b0e14}
+::-webkit-scrollbar-thumb{background:#3b82f633;border-radius:3px}
+.container{max-width:1000px;margin:0 auto;padding:0 24px}
+.noise{position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:0.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-repeat:repeat;background-size:256px}
+.grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(59,130,246,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.025) 1px,transparent 1px);background-size:60px 60px}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 32px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(180deg,rgba(11,14,20,0.95) 0%,transparent 100%);backdrop-filter:blur(12px)}
+.nav-logo{font-family:'Noto Serif SC',serif;font-size:1.1rem;font-weight:700;color:#dfe2ea;text-decoration:none;letter-spacing:0.05em}
+.nav-logo span{color:#3b82f6}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{color:#7a8090;text-decoration:none;font-size:0.85rem;letter-spacing:0.05em;transition:color 0.3s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:#3b82f6;transition:width 0.3s}
+.nav-links a:hover{color:#dfe2ea}
+.nav-links a:hover::after{width:100%}
+.nav-links a.active{color:#3b82f6}
+.page-hero{position:relative;z-index:2;padding:160px 0 80px}
+.page-hero h1{font-family:'Noto Serif SC',serif;font-size:clamp(2.4rem,5vw,3.6rem);font-weight:900;line-height:1.15;margin-bottom:20px}
+.subtitle{font-family:'JetBrains Mono',monospace;font-size:0.75rem;letter-spacing:0.15em;color:#3b82f6;margin-bottom:16px}
+.page-hero p{color:#7a8090;font-size:1.05rem;max-width:600px;font-weight:300}
 
-.container { max-width: 1000px; margin:0 auto; padding:0 24px; }
+.timeline-section{position:relative;z-index:2;padding:0 0 120px}
+.timeline-section h2{font-family:'Noto Serif SC',serif;font-size:1.8rem;font-weight:700;margin-bottom:48px}
+.timeline{position:relative}
+.timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:linear-gradient(#3b82f633,#3b82f6,#f59e0b,#3b82f633)}
+.tl-item{position:relative;padding-left:40px;padding-bottom:48px}
+.tl-item:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:-5px;top:0;width:11px;height:11px;border-radius:50%;border:2px solid #3b82f6;background:#0b0e14}
+.tl-item.amber .tl-dot{border-color:#f59e0b}
+.tl-year{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:#3b82f6;margin-bottom:4px}
+.tl-item.amber .tl-year{color:#f59e0b}
+.tl-title{font-family:'Noto Serif SC',serif;font-size:1.15rem;font-weight:600;margin-bottom:6px}
+.tl-desc{color:#7a8090;font-size:0.9rem;line-height:1.8;max-width:600px}
 
-.noise {
-  position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0.035;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat:repeat; background-size:256px 256px;
-}
-.grid-bg {
-  position:fixed; inset:0; z-index:0;
-  background-image:linear-gradient(rgba(212,168,83,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(212,168,83,0.03) 1px,transparent 1px);
-  background-size:60px 60px;
-}
+.philosophy{position:relative;z-index:2;padding:0 0 120px}
+.philosophy h2{font-family:'Noto Serif SC',serif;font-size:1.8rem;font-weight:700;margin-bottom:48px}
+.phil-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.phil-card{padding:32px;background:#10131c;border:1px solid #1a1f2e;border-radius:12px;transition:border-color 0.3s}
+.phil-card:hover{border-color:#3b82f633}
+.phil-card .num{font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:500;color:#3b82f633;margin-bottom:8px;line-height:1}
+.phil-card h3{font-family:'Noto Serif SC',serif;font-size:1.1rem;margin-bottom:8px;color:#dfe2ea}
+.phil-card p{color:#7a8090;font-size:0.9rem;line-height:1.7}
 
-nav {
-  position:fixed; top:0; left:0; right:0; z-index:100;
-  padding:20px 32px;
-  display:flex; justify-content:space-between; align-items:center;
-  background:linear-gradient(180deg,rgba(10,10,15,0.95) 0%,transparent 100%);
-  backdrop-filter:blur(12px);
-}
-.nav-logo {
-  font-family:'Noto Serif SC',serif; font-size:1.1rem; font-weight:700;
-  color:#e8e6e3; text-decoration:none; letter-spacing:0.05em;
-}
-.nav-logo span { color:#d4a853; }
-.nav-links { display:flex; gap:32px; list-style:none; }
-.nav-links a {
-  color:#8a8a92; text-decoration:none; font-size:0.85rem;
-  letter-spacing:0.05em; transition:color 0.3s; position:relative;
-}
-.nav-links a::after {
-  content:''; position:absolute; bottom:-4px; left:0;
-  width:0; height:1px; background:#d4a853; transition:width 0.3s;
-}
-.nav-links a:hover { color:#e8e6e3; }
-.nav-links a:hover::after { width:100%; }
-.nav-links a.active { color:#d4a853; }
-
-/* ===== HERO ===== */
-.page-hero {
-  position:relative; z-index:2;
-  padding:160px 0 80px;
-}
-.page-hero h1 {
-  font-family:'Noto Serif SC',serif;
-  font-size:clamp(2.4rem,5vw,3.6rem); font-weight:900;
-  line-height:1.15; margin-bottom:20px;
-}
-.page-hero .subtitle {
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.75rem; letter-spacing:0.15em;
-  color:#d4a853; margin-bottom:16px;
-}
-.page-hero p {
-  color:#8a8a92; font-size:1.05rem; max-width:600px; font-weight:300;
-}
-
-/* ===== TIMELINE ===== */
-.timeline-section {
-  position:relative; z-index:2;
-  padding:0 0 120px;
-}
-.timeline-section h2 {
-  font-family:'Noto Serif SC',serif;
-  font-size:1.8rem; font-weight:700; margin-bottom:48px;
-}
-.timeline {
-  position:relative;
-}
-.timeline::before {
-  content:''; position:absolute; left:0; top:0; bottom:0;
-  width:1px; background:linear-gradient(#d4a85333,#d4a853,#d4a85333);
-}
-.tl-item {
-  position:relative; padding-left:40px; padding-bottom:48px;
-}
-.tl-item:last-child { padding-bottom:0; }
-.tl-dot {
-  position:absolute; left:-5px; top:0;
-  width:11px; height:11px; border-radius:50%;
-  border:2px solid #d4a853; background:#0a0a0f;
-}
-.tl-year {
-  font-family:'JetBrains Mono',monospace;
-  font-size:0.8rem; color:#d4a853; margin-bottom:4px;
-}
-.tl-title {
-  font-family:'Noto Serif SC',serif;
-  font-size:1.15rem; font-weight:600; margin-bottom:6px;
-}
-.tl-desc {
-  color:#8a8a92; font-size:0.9rem; line-height:1.8; max-width:600px;
-}
-
-/* ===== PHILOSOPHY ===== */
-.philosophy {
-  position:relative; z-index:2;
-  padding:0 0 120px;
-}
-.philosophy h2 {
-  font-family:'Noto Serif SC',serif;
-  font-size:1.8rem; font-weight:700; margin-bottom:48px;
-}
-.phil-grid {
-  display:grid; grid-template-columns:1fr 1fr; gap:24px;
-}
-.phil-card {
-  padding:32px; background:#0f0f18; border:1px solid #1a1a26;
-  border-radius:12px; transition:border-color 0.3s;
-}
-.phil-card:hover { border-color:#d4a85333; }
-.phil-card .num {
-  font-family:'JetBrains Mono',monospace;
-  font-size:2rem; font-weight:500; color:#d4a85333;
-  margin-bottom:8px; line-height:1;
-}
-.phil-card h3 {
-  font-family:'Noto Serif SC',serif;
-  font-size:1.1rem; margin-bottom:8px;
-}
-.phil-card p {
-  color:#8a8a92; font-size:0.9rem; line-height:1.7;
-}
-
-/* ===== FOOTER ===== */
-footer {
-  position:relative; z-index:2; padding:48px 24px;
-  border-top:1px solid #1a1a26; text-align:center;
-}
-footer p {
-  color:#4a4a5a; font-size:0.8rem;
-  font-family:'JetBrains Mono',monospace; letter-spacing:0.05em;
-}
-.footer-links {
-  display:flex; justify-content:center; gap:24px;
-  list-style:none; margin-bottom:16px;
-}
-.footer-links a {
-  color:#6a6a7a; text-decoration:none; font-size:0.8rem; transition:color 0.3s;
-}
-.footer-links a:hover { color:#d4a853; }
-
-@media (max-width:768px) {
-  .nav-links { display:none; }
-  .phil-grid { grid-template-columns:1fr; }
-  .page-hero { padding:140px 0 60px; }
-}
+footer{position:relative;z-index:2;padding:48px 24px;border-top:1px solid #1a1f2e;text-align:center}
+footer p{color:#3a3f4a;font-size:0.8rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.05em}
+.footer-links{display:flex;justify-content:center;gap:24px;list-style:none;margin-bottom:16px}
+.footer-links a{color:#5a6070;text-decoration:none;font-size:0.8rem;transition:color 0.3s}
+.footer-links a:hover{color:#3b82f6}
+@media(max-width:768px){.nav-links{display:none}.phil-grid{grid-template-columns:1fr}.page-hero{padding:140px 0 60px}}
 </style>
 </head>
 <body>
-
 <div class="noise"></div>
 <div class="grid-bg"></div>
-
 <nav>
-  <a href="index.html" class="nav-logo"><span>⟡</span> 物理影像</a>
+  <a href="index.html" class="nav-logo"><span>⟡</span> 物理学习法</a>
   <ul class="nav-links">
     <li><a href="index.html">首页</a></li>
-    <li><a href="courses.html">课程</a></li>
-    <li><a href="articles.html">文章</a></li>
-    <li><a href="portfolio.html">作品</a></li>
+    <li><a href="method.html">方法论</a></li>
+    <li><a href="content.html">内容</a></li>
     <li><a href="about.html" class="active">关于</a></li>
   </ul>
 </nav>
@@ -185,8 +76,8 @@ footer p {
 <section class="page-hero">
   <div class="container">
     <div class="subtitle">ABOUT</div>
-    <h1>一个物理系毕业生的<br>影像之路</h1>
-    <p>从北大物院到自媒体创作者，我花了36年时间明白一件事：所有创造性的工作，背后都有清晰的逻辑。</p>
+    <h1>一个物理系毕业生的<br>学习探索之路</h1>
+    <p>从北大物院到自媒体创作者，我花了36年明白一件事：学会学习，是一切学习的元技能。</p>
   </div>
 </section>
 
@@ -194,69 +85,57 @@ footer p {
   <div class="container">
     <h2>时间线</h2>
     <div class="timeline">
-
       <div class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-year">2008 — 2012</div>
         <div class="tl-title">北京大学 物理学院 本科</div>
-        <div class="tl-desc">基础物理学科训练，四大力学、量子力学、统计物理。种下了"用第一性原理理解世界"的思维方式。课余时间开始接触摄影，从一台借来的单反开始。</div>
+        <div class="tl-desc">四年基础物理训练，四大力学、量子力学、统计物理。最大的收获不是知识本身，而是一套拆解复杂问题的思维操作系统。第一次意识到：物理学训练的本质就是「最优方法论训练」。</div>
       </div>
-
       <div class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-year">2012 — 2014</div>
-        <div class="tl-title">北京大学 物理学院 硕士（理论物理方向）</div>
-        <div class="tl-desc">深入研究理论物理，同时摄影从爱好变成了"副业"。帮同学拍毕业照、帮实验室拍宣传片，逐渐发现影像创作和物理学在底层逻辑上的相通之处。</div>
+        <div class="tl-title">北京大学 物理学院 硕士</div>
+        <div class="tl-desc">理论物理方向深入研究。开始系统思考一个问题：为什么同样的教材、同样的老师，有人学得轻松有人学得痛苦？差距不在智商，在方法。开始记录和提炼自己的学习方法论。</div>
       </div>
-
       <div class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-year">2014 — 2018</div>
-        <div class="tl-title">科研与创作的拉扯</div>
-        <div class="tl-desc">结业后进入科技公司做技术相关岗位。业余时间系统学习电影摄影、剪辑、调色。周末全部泡在拍摄和后期中，接商业项目积累经验。这四年是"双倍人生"——白天工程师，晚上创作者。</div>
+        <div class="tl-year">2014 — 2022</div>
+        <div class="tl-title">工作与沉淀</div>
+        <div class="tl-desc">结业后进入职场。八年时间里持续学习新领域——编程、数据分析、设计、写作。每次进入新领域，都在验证同一件事：物理思维方法论可以迁移到任何学习场景。方法对了，学习效率差10倍。</div>
       </div>
-
-      <div class="tl-item">
+      <div class="tl-item amber">
         <div class="tl-dot"></div>
-        <div class="tl-year">2018 — 2022</div>
-        <div class="tl-title">全职转型：自媒体创作者</div>
-        <div class="tl-desc">30岁那年决定全职做内容创作。开始在B站和抖音发拍摄剪辑教程，用"物理思维讲摄影"的独特视角逐渐积累了一批忠实学员。从一个人到组建了小团队。</div>
+        <div class="tl-year">2024 — 至今</div>
+        <div class="tl-title">36岁重启：做学习方法布道者</div>
+        <div class="tl-desc">决定把六年物理训练 + 八年跨领域学习验证出的方法论系统输出。不教物理知识，教「学知识的方法」。用物理思维重新定义「会学习」这件事——这就是「物理学习法」的起点。</div>
       </div>
-
-      <div class="tl-item">
-        <div class="tl-dot"></div>
-        <div class="tl-year">2022 — 至今</div>
-        <div class="tl-title">系统化教学：从物理到影像</div>
-        <div class="tl-desc">36岁，沉淀了六年教学经验，打磨出完整的五阶课程体系。50K+学员，80+课程视频——这不是终点，而是把"用理性理解创作"这件事讲给更多人听的新起点。</div>
-      </div>
-
     </div>
   </div>
 </section>
 
 <section class="philosophy">
   <div class="container">
-    <h2>我的教学理念</h2>
+    <h2>我的信念</h2>
     <div class="phil-grid">
       <div class="phil-card">
         <div class="num">01</div>
-        <h3>授人以渔，而非授人以鱼</h3>
-        <p>不教死记硬背的参数组合，而是教底层逻辑——当你理解了光、镜头和人眼，任何设备都能拍出好画面。</p>
+        <h3>方法 &gt; 努力</h3>
+        <p>大部分人的学习困境不是因为不够努力，而是方法效率太低。方法的杠杆率是努力的10倍以上。优化方法，比增加时长更值得投入。</p>
       </div>
       <div class="phil-card">
         <div class="num">02</div>
-        <h3>从简单到复杂，循序渐进</h3>
-        <p>影像创作有清晰的路径。先拍清楚，再拍好看，再讲好故事。跳过基础直接追求炫技，最终会回来补课。</p>
+        <h3>理解 &gt; 记忆</h3>
+        <p>记忆会衰退，理解不会。从底层原理推导出来的知识，比背下来的知识牢固一百倍。费曼说：如果你不能用简单的话解释它，你就没有真正理解它。</p>
       </div>
       <div class="phil-card">
         <div class="num">03</div>
-        <h3>理性拆解，感性表达</h3>
-        <p>技术是骨架，情感是血肉。用物理思维的严谨性打好技术基础，再用创作者的自由去表达。</p>
+        <h3>系统 &gt; 碎片</h3>
+        <p>零散的知识点没有力量，系统才有。学知识不是收集砖头，是盖房子。知识点之间的连接，比知识点本身更重要。</p>
       </div>
       <div class="phil-card">
         <div class="num">04</div>
-        <h3>没有最好的设备，只有最合适的</h3>
-        <p>手机还是电影机？重要的是你想表达什么。器材是工具，不是目的。选择适合你当前阶段和目标的设备。</p>
+        <h3>迭代 &gt; 完美</h3>
+        <p>学习是迭代过程，不是一次性过程。允许第一遍是错的。每一遍比上一遍更接近正确，就是好的学习。完美主义是学习的敌人。</p>
       </div>
     </div>
   </div>
@@ -265,13 +144,11 @@ footer p {
 <footer>
   <ul class="footer-links">
     <li><a href="index.html">首页</a></li>
-    <li><a href="courses.html">课程</a></li>
-    <li><a href="articles.html">文章</a></li>
-    <li><a href="portfolio.html">作品</a></li>
+    <li><a href="method.html">方法论</a></li>
+    <li><a href="content.html">内容</a></li>
     <li><a href="about.html">关于</a></li>
   </ul>
-  <p>⟡ 从物理到影像 · 北京大学物理学院 · 36岁重启人生</p>
+  <p>⟡ 物理学习法 · 北大物理本硕 · 36岁重新定义「会学习」</p>
 </footer>
-
 </body>
 </html>

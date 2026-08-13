@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方法论 — 物理学习法</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter','Noto Serif SC',serif;background:#0b0e14;color:#dfe2ea;line-height:1.7;overflow-x:hidden}
+::selection{background:#3b82f6;color:#fff}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0b0e14}
+::-webkit-scrollbar-thumb{background:#3b82f633;border-radius:3px}
+.container{max-width:1000px;margin:0 auto;padding:0 24px}
+.noise{position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:0.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-repeat:repeat;background-size:256px}
+.grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(59,130,246,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.025) 1px,transparent 1px);background-size:60px 60px}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 32px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(180deg,rgba(11,14,20,0.95) 0%,transparent 100%);backdrop-filter:blur(12px)}
+.nav-logo{font-family:'Noto Serif SC',serif;font-size:1.1rem;font-weight:700;color:#dfe2ea;text-decoration:none;letter-spacing:0.05em}
+.nav-logo span{color:#3b82f6}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{color:#7a8090;text-decoration:none;font-size:0.85rem;letter-spacing:0.05em;transition:color 0.3s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:#3b82f6;transition:width 0.3s}
+.nav-links a:hover{color:#dfe2ea}
+.nav-links a:hover::after{width:100%}
+.nav-links a.active{color:#3b82f6}
+.page-header{position:relative;z-index:2;padding:160px 0 60px}
+.page-header h1{font-family:'Noto Serif SC',serif;font-size:clamp(2.4rem,5vw,3.6rem);font-weight:900;line-height:1.15;margin-bottom:16px}
+.subtitle{font-family:'JetBrains Mono',monospace;font-size:0.75rem;letter-spacing:0.15em;color:#3b82f6;margin-bottom:16px}
+.page-header p{color:#7a8090;font-size:1.05rem;max-width:600px;font-weight:300}
+.methods{position:relative;z-index:2;padding:0 0 120px}
+.method-block{margin-bottom:64px;padding:40px;background:#10131c;border:1px solid #1a1f2e;border-radius:16px;position:relative;overflow:hidden}
+.method-block::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:linear-gradient(180deg,#3b82f6,#f59e0b)}
+.method-head{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.method-num{font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:500;color:#3b82f633;flex-shrink:0}
+.method-head h2{font-family:'Noto Serif SC',serif;font-size:1.4rem;font-weight:700;color:#dfe2ea}
+.method-physics{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#f59e0b;margin-bottom:16px;padding:8px 16px;background:#f59e0b0d;border:1px solid #f59e0b1a;border-radius:6px;display:inline-block}
+.method-desc{color:#9aa0ac;font-size:0.95rem;line-height:1.9;margin-bottom:20px}
+.method-desc strong{color:#dfe2ea}
+.method-steps{list-style:none}
+.method-steps li{padding:10px 0 10px 28px;position:relative;color:#7a8090;font-size:0.9rem;border-bottom:1px solid #1a1f2e}
+.method-steps li:last-child{border-bottom:none}
+.method-steps li::before{content:counter(step);counter-increment:step;position:absolute;left:0;top:10px;width:20px;height:20px;border-radius:50%;background:#3b82f622;color:#3b82f6;font-family:'JetBrains Mono',monospace;font-size:0.7rem;display:flex;align-items:center;justify-content:center}
+.method-steps{counter-reset:step}
+.method-example{margin-top:16px;padding:16px 20px;background:#0b0e14;border-radius:8px;border-left:2px solid #f59e0b}
+.method-example .label{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:#f59e0b;letter-spacing:0.1em;margin-bottom:6px}
+.method-example p{color:#7a8090;font-size:0.88rem;line-height:1.7}
+footer{position:relative;z-index:2;padding:48px 24px;border-top:1px solid #1a1f2e;text-align:center}
+footer p{color:#3a3f4a;font-size:0.8rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.05em}
+.footer-links{display:flex;justify-content:center;gap:24px;list-style:none;margin-bottom:16px}
+.footer-links a{color:#5a6070;text-decoration:none;font-size:0.8rem;transition:color 0.3s}
+.footer-links a:hover{color:#3b82f6}
+@media(max-width:768px){.nav-links{display:none}.page-header{padding:140px 0 40px}.method-block{padding:24px}}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="grid-bg"></div>
+<nav>
+  <a href="index.html" class="nav-logo"><span>⟡</span> 物理学习法</a>
+  <ul class="nav-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="method.html" class="active">方法论</a></li>
+    <li><a href="content.html">内容</a></li>
+    <li><a href="about.html">关于</a></li>
+  </ul>
+</nav>
+
+<section class="page-header">
+  <div class="container">
+    <div class="subtitle">METHODOLOGY</div>
+    <h1>物理学习法 · 完整体系</h1>
+    <p>六套从物理学思维中提炼的学习方法论。每套方法都有物理原型、操作步骤和真实案例。从简单到复杂，逐步构建你的学习引擎。</p>
+  </div>
+</section>
+
+<section class="methods">
+  <div class="container">
+
+    <div class="method-block">
+      <div class="method-head">
+        <span class="method-num">01</span>
+        <h2>第一性原理学习法</h2>
+      </div>
+      <div class="method-physics">物理原型：公理化体系 — 从牛顿三定律推导整个经典力学</div>
+      <p class="method-desc">物理学最强大的武器：不记住结论，而是从最基本的公理出发，<strong>推导出所有结论</strong>。牛顿三定律可以推出整个经典力学，麦克斯韦方程组可以推出整个电磁学。学习也一样——任何知识都可以还原为更基本的原理组合。</p>
+      <ol class="method-steps">
+        <li>找到一个知识的「底层公理」——不能再被进一步解释的那个前提</li>
+        <li>从公理出发，一步步推导，看看能不能重建这个知识</li>
+        <li>推导卡住的地方，就是你真正没理解的地方</li>
+        <li>用费曼技巧验证：能否用公理向一个外行解释这个知识</li>
+      </ol>
+      <div class="method-example">
+        <div class="label">案例</div>
+        <p>学微积分不要从公式开始，从「无穷小量」这个公理概念出发：什么是极限？为什么需要极限？导数是极限的什么应用？积分和导数为什么是逆运算？一路推下来，整个微积分框架自己就长出来了。</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-head">
+        <span class="method-num">02</span>
+        <h2>降维拆解法</h2>
+      </div>
+      <div class="method-physics">物理原型：量纲分析 — 用 π 定理把复杂问题降到最少变量</div>
+      <p class="method-desc">物理学解决复杂问题的标准操作：<strong>隔离变量，逐个分析</strong>。量纲分析告诉我们，任何物理问题都可以通过分析基本维度（长度、时间、质量）来简化。学习任务也一样——看似复杂的东西，拆开来看其实只有几个关键变量。</p>
+      <ol class="method-steps">
+        <li>列出影响你学习结果的「全部变量」（时间、方法、状态、环境…）</li>
+        <li>判断哪些是关键变量，哪些是噪声（可忽略的）</li>
+        <li>一次只改变一个变量，观察效果（控制变量法）</li>
+        <li>找到高杠杆变量，集中精力优化它</li>
+      </ol>
+      <div class="method-example">
+        <div class="label">案例</div>
+        <p>考研复习效率低？先拆变量：复习时间×复习方法×理解深度×遗忘速度×心态波动。你会发现「遗忘速度」是最高杠杆变量——优化间隔重复策略，比增加复习时间有效十倍。</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-head">
+        <span class="method-num">03</span>
+        <h2>系统建模学习法</h2>
+      </div>
+      <div class="method-physics">物理原型：物理模型 — 用简化模型描述复杂系统，再逐步修正</div>
+      <p class="method-desc">物理学不研究孤立现象，研究<strong>系统</strong>。理想气体模型、谐振子模型、场模型——每个模型都描述了一类系统的行为。学知识也一样：不要收集知识点，要构建知识系统。知识点之间的<strong>连接</strong>比知识点本身更重要。</p>
+      <ol class="method-steps">
+        <li>每学一个新概念，问自己：它属于哪个系统？和哪些概念有连接？</li>
+        <li>画知识图谱：节点是概念，边是关系（因果、包含、对立、衍生）</li>
+        <li>找到「枢纽概念」——连接最多其他概念的核心节点</li>
+        <li>用模型解释现象：如果模型预测和现实不符，修正模型</li>
+      </ol>
+      <div class="method-example">
+        <div class="label">案例</div>
+        <p>学量子力学，「波粒二象性」是枢纽概念。它连接了：不确定性原理、薛定谔方程、测量问题、纠缠态。把波粒二象性放在中心，其他概念自然挂上——这就是一个自洽的知识系统。</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-head">
+        <span class="method-num">04</span>
+        <h2>迭代逼近法</h2>
+      </div>
+      <div class="method-physics">物理原型：数值迭代 — 牛顿法、蒙特卡洛、逐步逼近真实解</div>
+      <p class="method-desc">很多物理问题没有解析解，只能<strong>数值逼近</strong>——先给一个粗略的猜测，然后不断迭代修正，逐渐逼近真实答案。学习不是一次到位的过程，是不断迭代的过本。允许第一遍是错的，关键是每一遍比上一遍更接近正确。</p>
+      <ol class="method-steps">
+        <li>第一遍：快速浏览，建立粗略框架（允许大量不确定）</li>
+        <li>第二遍：填充细节，修正明显错误</li>
+        <li>第三遍：做题/应用，暴露理解偏差</li>
+        <li>第N遍：教别人，发现深层盲区</li>
+        <li>每一遍的反馈信息，用于修正下一遍的迭代方向</li>
+      </ol>
+      <div class="method-example">
+        <div class="label">案例</div>
+        <p>学线性代数，第一遍看懂矩阵乘法怎么算（操作层），第二遍理解为什么这么算（逻辑层），第三遍理解矩阵是线性变换（几何层），第四遍理解特征值是变换的不变量（本质层）。四遍迭代，认知不断逼近本质。</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-head">
+        <span class="method-num">05</span>
+        <h2>最低能量路径</h2>
+      </div>
+      <div class="method-physics">物理原型：最小作用量原理 — 自然界总是选择「阻力最小」的路径</div>
+      <p class="method-desc">物理系统总是趋向最低能量态——水往低处流，光走最短路径。学习也一样：如果你的学习方式让你痛苦、需要消耗大量意志力，说明你走的是<strong>高能量路径</strong>。好的学习方法，应该找到那条认知阻力最小的路径。</p>
+      <ol class="method-steps">
+        <li>识别你学习中的「高摩擦点」——哪些环节让你想放弃？</li>
+        <li>为每个高摩擦点寻找替代路径（换教材、换顺序、换表征方式）</li>
+        <li>优先选择「直觉友好」的理解路径，再补充严谨性</li>
+        <li>好老师/好书的作用 = 帮你找到最低能量路径</li>
+      </ol>
+      <div class="method-example">
+        <div class="label">案例</div>
+        <p>学傅里叶变换，直接从公式入手是高能量路径（抽象、反直觉）。先从「声音分解」的直觉入手——任何复杂声音都能分解为简单正弦波的叠加——建立直觉后再看公式，阻力大幅降低。</p>
+      </div>
+    </div>
+
+    <div class="method-block">
+      <div class="method-head">
+        <span class="method-num">06</span>
+        <h2>不确定性与元认知</h2>
+      </div>
+      <div class="method-physics">物理原型：海森堡不确定性原理 — 精确测量有物理极限</div>
+      <p class="method-desc">量子力学告诉我们：不是所有东西都能被精确测量，<strong>不确定性是物理世界的本质特征</strong>。学习也一样——你不可能一次性完全理解一个概念，「暂时不懂」不是失败，是学习的正常状态。关键是<strong>元认知</strong>：知道自己知道什么、不知道什么、不确定什么。</p>
+      <ol class="method-steps">
+        <li>学完一个概念后，给自己做一个「理解度评估」：1分(听过)→3分(能做)→5分(能教)</li>
+        <li>标注你的「不确定区域」——哪些地方你觉得「大概是这样但说不清」</li>
+        <li>主动暴露盲区：做题、讨论、教别人，让不确定性浮出水面</li>
+        <li>接受渐进式理解：这一遍3分，下一遍4分，不需要一次到5分</li>
+      </ol>
+      <div class="method-example">
+        <div class="label">案例</div>
+        <p>学完热力学第二定律，问自己：我能解释为什么熵增吗？（3分）我能解释为什么生命不违反熵增吗？（2分）我能解释麦克斯韦妖为什么不能逆转熵增吗？（1分）。标注这个1分区域，就是下一步的学习靶点。</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <ul class="footer-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="method.html">方法论</a></li>
+    <li><a href="content.html">内容</a></li>
+    <li><a href="about.html">关于</a></li>
+  </ul>
+  <p>⟡ 物理学习法 · 北大物理本硕 · 36岁重新定义「会学习」</p>
+</footer>
+</body>
+</html>

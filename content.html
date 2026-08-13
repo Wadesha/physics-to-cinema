@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>内容矩阵 — 物理学习法</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter','Noto Serif SC',serif;background:#0b0e14;color:#dfe2ea;line-height:1.7;overflow-x:hidden}
+::selection{background:#3b82f6;color:#fff}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0b0e14}
+::-webkit-scrollbar-thumb{background:#3b82f633;border-radius:3px}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+.noise{position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:0.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-repeat:repeat;background-size:256px}
+.grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(59,130,246,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.025) 1px,transparent 1px);background-size:60px 60px}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 32px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(180deg,rgba(11,14,20,0.95) 0%,transparent 100%);backdrop-filter:blur(12px)}
+.nav-logo{font-family:'Noto Serif SC',serif;font-size:1.1rem;font-weight:700;color:#dfe2ea;text-decoration:none;letter-spacing:0.05em}
+.nav-logo span{color:#3b82f6}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{color:#7a8090;text-decoration:none;font-size:0.85rem;letter-spacing:0.05em;transition:color 0.3s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:#3b82f6;transition:width 0.3s}
+.nav-links a:hover{color:#dfe2ea}
+.nav-links a:hover::after{width:100%}
+.nav-links a.active{color:#3b82f6}
+.page-header{position:relative;z-index:2;padding:160px 0 60px}
+.page-header h1{font-family:'Noto Serif SC',serif;font-size:clamp(2.4rem,5vw,3.6rem);font-weight:900;line-height:1.15;margin-bottom:16px}
+.subtitle{font-family:'JetBrains Mono',monospace;font-size:0.75rem;letter-spacing:0.15em;color:#3b82f6;margin-bottom:16px}
+.page-header p{color:#7a8090;font-size:1.05rem;max-width:600px;font-weight:300}
+
+.pillars{position:relative;z-index:2;padding:0 0 80px}
+.pillars-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:48px}
+.pillar{background:#10131c;border:1px solid #1a1f2e;border-radius:16px;padding:40px;transition:border-color 0.3s;position:relative;overflow:hidden}
+.pillar:hover{border-color:#3b82f633}
+.pillar::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,#3b82f6,transparent)}
+.pillar-icon{font-size:1.8rem;margin-bottom:16px}
+.pillar h2{font-family:'Noto Serif SC',serif;font-size:1.3rem;font-weight:700;margin-bottom:8px;color:#dfe2ea}
+.pillar .tagline{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#f59e0b;margin-bottom:16px;letter-spacing:0.1em}
+.pillar>p{color:#7a8090;font-size:0.9rem;line-height:1.7;margin-bottom:20px}
+.pillar-topics{list-style:none}
+.pillar-topics li{padding:8px 0;color:#9aa0ac;font-size:0.88rem;border-bottom:1px solid #1a1f2e;display:flex;align-items:center;gap:10px}
+.pillar-topics li:last-child{border-bottom:none}
+.pillar-topics li::before{content:'▸';color:#3b82f666;font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.pillar-topics li .level{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:#5a6070;padding:2px 8px;background:#1a1f2e;border-radius:4px}
+
+.platforms{position:relative;z-index:2;padding:0 0 120px}
+.platforms h2{font-family:'Noto Serif SC',serif;font-size:1.8rem;font-weight:700;margin-bottom:32px}
+.platform-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.platform-card{padding:24px 20px;background:#10131c;border:1px solid #1a1f2e;border-radius:12px;text-align:center;transition:border-color 0.3s;cursor:pointer;text-decoration:none;color:inherit}
+.platform-card:hover{border-color:#3b82f633;transform:translateY(-4px)}
+.platform-card .icon{font-size:1.8rem;margin-bottom:8px}
+.platform-card h3{font-family:'Noto Serif SC',serif;font-size:0.95rem;margin-bottom:4px;color:#dfe2ea}
+.platform-card p{font-size:0.75rem;color:#5a6070;font-family:'JetBrains Mono',monospace}
+
+.update-schedule{position:relative;z-index:2;padding:0 0 120px}
+.update-schedule h2{font-family:'Noto Serif SC',serif;font-size:1.8rem;font-weight:700;margin-bottom:32px}
+.schedule-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.schedule-card{padding:24px;background:#10131c;border:1px solid #1a1f2e;border-radius:12px}
+.schedule-day{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:#3b82f6;letter-spacing:0.15em;margin-bottom:6px}
+.schedule-card h3{font-family:'Noto Serif SC',serif;font-size:1rem;margin-bottom:6px;color:#dfe2ea}
+.schedule-card p{font-size:0.82rem;color:#7a8090;line-height:1.6}
+
+footer{position:relative;z-index:2;padding:48px 24px;border-top:1px solid #1a1f2e;text-align:center}
+footer p{color:#3a3f4a;font-size:0.8rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.05em}
+.footer-links{display:flex;justify-content:center;gap:24px;list-style:none;margin-bottom:16px}
+.footer-links a{color:#5a6070;text-decoration:none;font-size:0.8rem;transition:color 0.3s}
+.footer-links a:hover{color:#3b82f6}
+@media(max-width:768px){.nav-links{display:none}.pillars-grid,.platform-grid,.schedule-grid{grid-template-columns:1fr}.page-header{padding:140px 0 40px}.pillar{padding:24px}}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="grid-bg"></div>
+<nav>
+  <a href="index.html" class="nav-logo"><span>⟡</span> 物理学习法</a>
+  <ul class="nav-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="method.html">方法论</a></li>
+    <li><a href="content.html" class="active">内容</a></li>
+    <li><a href="about.html">关于</a></li>
+  </ul>
+</nav>
+
+<section class="page-header">
+  <div class="container">
+    <div class="subtitle">CONTENT MATRIX</div>
+    <h1>内容矩阵</h1>
+    <p>四大内容支柱，覆盖学习方法、思维模型、认知升级和升学实战。从简单到复杂，逐步构建你的学习操作系统。</p>
+  </div>
+</section>
+
+<section class="pillars">
+  <div class="container">
+    <div class="pillars-grid">
+      <div class="pillar">
+        <div class="pillar-icon">📚</div>
+        <h2>学习方法论</h2>
+        <div class="tagline">LEARNING METHOD</div>
+        <p>核心内容。把物理学习法的六套方法论拆解成可操作的步骤，每篇都有物理原型、操作指南和真实案例。</p>
+        <ul class="pillar-topics">
+          <li>第一性原理学习法：如何从公理重建知识 <span class="level">入门</span></li>
+          <li>降维拆解法：用控制变量法优化学习 <span class="level">入门</span></li>
+          <li>系统建模学习法：构建你的知识图谱 <span class="level">进阶</span></li>
+          <li>迭代逼近法：四遍学习法详解 <span class="level">进阶</span></li>
+          <li>最低能量路径：如何找到阻力最小的理解路径 <span class="level">核心</span></li>
+          <li>元认知训练：监控你的理解边界 <span class="level">精通</span></li>
+        </ul>
+      </div>
+
+      <div class="pillar">
+        <div class="pillar-icon">🧩</div>
+        <h2>思维模型</h2>
+        <div class="tagline">MENTAL MODELS</div>
+        <p>从物理学中提炼可迁移的思维工具，应用到学习、决策和生活的方方面面。不是学物理，是学物理学家<strong>怎么想问题</strong>。</p>
+        <ul class="pillar-topics">
+          <li>第一性原理：马斯克和费米的共同武器 <span class="level">入门</span></li>
+          <li>量纲分析：快速估算一切的方法 <span class="level">进阶</span></li>
+          <li>对称性思维：从不变性看本质 <span class="level">核心</span></li>
+          <li>极限思维：极端情况下的推理术 <span class="level">进阶</span></li>
+          <li>统计思维：从噪声中提取信号 <span class="level">核心</span></li>
+          <li>反馈系统：正反馈、负反馈与临界点 <span class="level">精通</span></li>
+        </ul>
+      </div>
+
+      <div class="pillar">
+        <div class="pillar-icon">⚡</div>
+        <h2>认知升级</h2>
+        <div class="tagline">COGNITIVE UPGRADE</div>
+        <p>元认知、批判性思维、知识迁移——那些学校不教但决定你天花板的东西。用物理视角重新理解「思考」本身。</p>
+        <ul class="pillar-topics">
+          <li>元认知：知道自己不知道什么 <span class="level">入门</span></li>
+          <li>批判性思维：不轻信任何结论 <span class="level">进阶</span></li>
+          <li>知识迁移：把一个领域的方法用到另一个领域 <span class="level">核心</span></li>
+          <li>认知偏差：你的大脑有哪些系统性错误 <span class="level">进阶</span></li>
+          <li>深度工作：进入心流的物理学 <span class="level">核心</span></li>
+          <li>反学习：如何推翻自己已有的认知 <span class="level">精通</span></li>
+        </ul>
+      </div>
+
+      <div class="pillar">
+        <div class="pillar-icon">🎓</div>
+        <h2>升学实战</h2>
+        <div class="tagline">EXAM STRATEGY</div>
+        <p>北大本硕的实战经验。不是鸡汤，是可复制的策略——从选校、备考到面试，每一步都有方法论支撑。</p>
+        <ul class="pillar-topics">
+          <li>北大物理本硕六年：我的真实经历 <span class="level">入门</span></li>
+          <li>考研复习的时间分配优化模型 <span class="level">进阶</span></li>
+          <li>理工科专业课的高效复习策略 <span class="level">核心</span></li>
+          <li>面试/答辩中的逻辑表达训练 <span class="level">进阶</span></li>
+          <li>36岁重启人生：给大龄学习者的建议 <span class="level">入门</span></li>
+          <li>从应试学习到终身学习的过渡 <span class="level">核心</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="platforms">
+  <div class="container">
+    <h2>关注渠道</h2>
+    <div class="platform-grid">
+      <a href="#" class="platform-card">
+        <div class="icon">📺</div>
+        <h3>B站</h3>
+        <p>长视频 · 方法论详解</p>
+      </a>
+      <a href="#" class="platform-card">
+        <div class="icon">📱</div>
+        <h3>抖音</h3>
+        <p>短视频 · 思维碎片</p>
+      </a>
+      <a href="#" class="platform-card">
+        <div class="icon">💬</div>
+        <h3>公众号</h3>
+        <p>深度文章 · 每周更新</p>
+      </a>
+      <a href="#" class="platform-card">
+        <div class="icon">🐦</div>
+        <h3>小红书</h3>
+        <p>学习笔记 · 经验分享</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="update-schedule">
+  <div class="container">
+    <h2>更新节奏</h2>
+    <div class="schedule-grid">
+      <div class="schedule-card">
+        <div class="schedule-day">MON</div>
+        <h3>方法论深度文</h3>
+        <p>公众号长文，详细拆解一套学习方法，附带案例和操作步骤。</p>
+      </div>
+      <div class="schedule-card">
+        <div class="schedule-day">WED</div>
+        <h3>思维模型短视频</h3>
+        <p>抖音/B站短视频，3分钟讲透一个物理思维模型。</p>
+      </div>
+      <div class="schedule-card">
+        <div class="schedule-day">FRI</div>
+        <h3>实战案例拆解</h3>
+        <p>用方法论拆解一个真实学习场景，从问题到解决方案。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <ul class="footer-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="method.html">方法论</a></li>
+    <li><a href="content.html">内容</a></li>
+    <li><a href="about.html">关于</a></li>
+  </ul>
+  <p>⟡ 物理学习法 · 北大物理本硕 · 36岁重新定义「会学习」</p>
+</footer>
+</body>
+</html>
