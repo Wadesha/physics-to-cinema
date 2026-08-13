@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>课程体系 — 从物理到影像</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', 'Noto Serif SC', serif;
+  background: #0a0a0f;
+  color: #e8e6e3;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+::selection { background: #d4a853; color: #0a0a0f; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0a0f; }
+::-webkit-scrollbar-thumb { background: #d4a85333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #d4a85366; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+.noise {
+  position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat; background-size: 256px 256px;
+}
+.grid-bg {
+  position: fixed; inset: 0; z-index: 0;
+  background-image: linear-gradient(rgba(212,168,83,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(212,168,83,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 20px 32px;
+  display: flex; justify-content: space-between; align-items: center;
+  background: linear-gradient(180deg, rgba(10,10,15,0.95) 0%, transparent 100%);
+  backdrop-filter: blur(12px);
+}
+.nav-logo {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.1rem; font-weight: 700; color: #e8e6e3;
+  text-decoration: none; letter-spacing: 0.05em;
+}
+.nav-logo span { color: #d4a853; }
+.nav-links { display: flex; gap: 32px; list-style: none; }
+.nav-links a {
+  color: #8a8a92; text-decoration: none; font-size: 0.85rem;
+  font-weight: 400; letter-spacing: 0.05em; transition: color 0.3s;
+  position: relative;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -4px; left: 0;
+  width: 0; height: 1px; background: #d4a853; transition: width 0.3s;
+}
+.nav-links a:hover { color: #e8e6e3; }
+.nav-links a:hover::after { width: 100%; }
+.nav-links a.active { color: #d4a853; }
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+  position: relative; z-index: 2;
+  padding: 160px 0 80px;
+  text-align: center;
+}
+.page-header .section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+  color: #d4a853; margin-bottom: 16px;
+}
+.page-header h1 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(2.4rem, 5vw, 3.6rem); font-weight: 900;
+  line-height: 1.15; margin-bottom: 20px;
+}
+.page-header p {
+  color: #8a8a92; font-size: 1.05rem; max-width: 560px; margin: 0 auto;
+  font-weight: 300;
+}
+
+/* ===== COURSE MODULES ===== */
+.modules {
+  position: relative; z-index: 2;
+  padding: 0 0 120px;
+}
+.module-card {
+  background: #0f0f18;
+  border: 1px solid #1a1a26;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+.module-card:hover { border-color: #d4a85333; }
+.module-header {
+  padding: 32px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+.module-level {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; color: #d4a853;
+  letter-spacing: 0.15em; margin-bottom: 4px;
+}
+.module-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.3rem; font-weight: 600;
+}
+.module-toggle {
+  font-size: 1.5rem; color: #5a5a6a;
+  transition: transform 0.3s;
+}
+.module-card.open .module-toggle { transform: rotate(45deg); }
+.module-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.module-card.open .module-body { max-height: 800px; }
+.module-body-inner {
+  padding: 0 40px 32px;
+  border-top: 1px solid #1a1a26;
+  padding-top: 24px;
+}
+.module-desc {
+  color: #8a8a92; font-size: 0.95rem; line-height: 1.8;
+  margin-bottom: 20px;
+}
+.module-lessons { list-style: none; }
+.module-lessons li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #1a1a2611;
+  font-size: 0.9rem;
+  color: #b0b0b8;
+}
+.module-lessons li:last-child { border-bottom: none; }
+.module-lessons li::before {
+  content: '▸';
+  color: #d4a85366;
+  font-family: 'JetBrains Mono', monospace;
+}
+.lesson-duration {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: #5a5a6a;
+}
+
+/* ===== PRICING ===== */
+.pricing {
+  position: relative; z-index: 2;
+  padding: 0 0 120px;
+}
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 48px;
+}
+.pricing-card {
+  background: #0f0f18;
+  border: 1px solid #1a1a26;
+  border-radius: 16px;
+  padding: 40px 32px;
+  position: relative;
+  transition: all 0.3s;
+}
+.pricing-card:hover {
+  border-color: #d4a85333;
+  transform: translateY(-4px);
+}
+.pricing-card.featured {
+  border-color: #d4a85333;
+  background: linear-gradient(135deg, #0f0f18 0%, #14141e 100%);
+}
+.pricing-card.featured::before {
+  content: '推荐';
+  position: absolute; top: -1px; right: 32px;
+  padding: 6px 16px;
+  background: #d4a853;
+  color: #0a0a0f;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  border-radius: 0 0 8px 8px;
+}
+.pricing-name {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.2rem; font-weight: 600; margin-bottom: 8px;
+}
+.pricing-desc {
+  color: #8a8a92; font-size: 0.85rem; line-height: 1.6;
+  margin-bottom: 24px; min-height: 48px;
+}
+.pricing-price {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2.4rem; font-weight: 500; color: #d4a853;
+  margin-bottom: 4px;
+}
+.pricing-price small {
+  font-size: 0.9rem; color: #5a5a6a; font-weight: 400;
+}
+.pricing-original {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem; color: #5a5a6a; text-decoration: line-through;
+  margin-bottom: 24px;
+}
+.pricing-features { list-style: none; margin-bottom: 32px; }
+.pricing-features li {
+  padding: 8px 0;
+  font-size: 0.85rem;
+  color: #8a8a92;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pricing-features li::before {
+  content: '✓';
+  color: #d4a853;
+  font-weight: 600;
+}
+.pricing-btn {
+  display: block;
+  text-align: center;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s;
+  border: 1px solid #e8e6e322;
+  color: #e8e6e3;
+}
+.pricing-btn:hover {
+  border-color: #d4a853;
+  color: #d4a853;
+}
+.pricing-card.featured .pricing-btn {
+  background: #d4a853;
+  color: #0a0a0f;
+  border-color: #d4a853;
+}
+.pricing-card.featured .pricing-btn:hover {
+  background: #e0b95e;
+  box-shadow: 0 8px 24px rgba(212,168,83,0.25);
+}
+
+/* ===== FOOTER ===== */
+footer {
+  position: relative; z-index: 2;
+  padding: 48px 24px;
+  border-top: 1px solid #1a1a26;
+  text-align: center;
+}
+footer p {
+  color: #4a4a5a; font-size: 0.8rem;
+  font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em;
+}
+.footer-links {
+  display: flex; justify-content: center; gap: 24px;
+  list-style: none; margin-bottom: 16px;
+}
+.footer-links a {
+  color: #6a6a7a; text-decoration: none; font-size: 0.8rem;
+  transition: color 0.3s;
+}
+.footer-links a:hover { color: #d4a853; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .module-header { padding: 24px; }
+  .module-body-inner { padding: 0 24px 24px; }
+  .page-header { padding: 140px 0 60px; }
+}
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+<div class="grid-bg"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo"><span>⟡</span> 物理影像</a>
+  <ul class="nav-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="courses.html" class="active">课程</a></li>
+    <li><a href="articles.html">文章</a></li>
+    <li><a href="portfolio.html">作品</a></li>
+    <li><a href="about.html">关于</a></li>
+  </ul>
+</nav>
+
+<section class="page-header">
+  <div class="container">
+    <div class="section-label">CURRICULUM</div>
+    <h1>系统化课程体系</h1>
+    <p>从物理思维出发，用理性拆解影像创作的每一个环节。五阶递进，零基础也能直达专业水平。</p>
+  </div>
+</section>
+
+<section class="modules">
+  <div class="container">
+
+    <div class="module-card open">
+      <div class="module-header" onclick="this.parentElement.classList.toggle('open')">
+        <div>
+          <div class="module-level">Lv.1 — 入门</div>
+          <h3 class="module-title">手机也能拍大片</h3>
+        </div>
+        <span class="module-toggle">+</span>
+      </div>
+      <div class="module-body">
+        <div class="module-body-inner">
+          <p class="module-desc">
+            不需要昂贵设备。从构图法则、光线判断到手机参数设置，用物理思维理解"拍清楚"和"拍好看"之间的区别。本阶段的目标是：用你手中的手机，拍出让人眼前一亮的画面。
+          </p>
+          <ul class="module-lessons">
+            <li>构图的底层逻辑：黄金分割与视觉重量 <span class="lesson-duration">28min</span></li>
+            <li>自然光的判断与利用：从硬光到柔光 <span class="lesson-duration">35min</span></li>
+            <li>手机专业模式详解：ISO、快门、对焦 <span class="lesson-duration">42min</span></li>
+            <li>手持稳定技巧：呼吸法与支撑点 <span class="lesson-duration">22min</span></li>
+            <li>实战：用手机拍摄一支60秒短片 <span class="lesson-duration">45min</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="module-card">
+      <div class="module-header" onclick="this.parentElement.classList.toggle('open')">
+        <div>
+          <div class="module-level">Lv.2 — 进阶</div>
+          <h3 class="module-title">相机系统与曝光控制</h3>
+        </div>
+        <span class="module-toggle">+</span>
+      </div>
+      <div class="module-body">
+        <div class="module-body-inner">
+          <p class="module-desc">
+            光圈、快门、ISO——不再死记硬背。从物理光学出发，理解曝光三角的内在关系，彻底告别"自动挡依赖"。同时深入理解不同镜头的光学特性与适用场景。
+          </p>
+          <ul class="module-lessons">
+            <li>曝光三角：光圈的物理本质与景深控制 <span class="lesson-duration">38min</span></li>
+            <li>快门速度：运动模糊与凝固瞬间的物理学 <span class="lesson-duration">32min</span></li>
+            <li>ISO与噪点：传感器的工作原理 <span class="lesson-duration">28min</span></li>
+            <li>测光模式与曝光补偿：让相机为你服务 <span class="lesson-duration">35min</span></li>
+            <li>镜头光学：焦距、像差与MTF曲线 <span class="lesson-duration">45min</span></li>
+            <li>实战：手动曝光挑战——同一场景的三种曝光 <span class="lesson-duration">40min</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="module-card">
+      <div class="module-header" onclick="this.parentElement.classList.toggle('open')">
+        <div>
+          <div class="module-level">Lv.3 — 核心</div>
+          <h3 class="module-title">光影与色彩科学</h3>
+        </div>
+        <span class="module-toggle">+</span>
+      </div>
+      <div class="module-body">
+        <div class="module-body-inner">
+          <p class="module-desc">
+            色温、白平衡、色彩空间——这些不是玄学。从光的波粒二象性到人眼视觉感知，建立科学的色彩管理体系。掌握专业调色工作的核心技能。
+          </p>
+          <ul class="module-lessons">
+            <li>光的物理：色温、光谱与显色指数 <span class="lesson-duration">35min</span></li>
+            <li>人眼视觉：色彩感知与视觉适应 <span class="lesson-duration">28min</span></li>
+            <li>色彩理论与配色方案 <span class="lesson-duration">42min</span></li>
+            <li>Log与LUT：从理论到调色工作流 <span class="lesson-duration">50min</span></li>
+            <li>一级调色与二级调色实战 <span class="lesson-duration">55min</span></li>
+            <li>风格化色调：从分析到创造 <span class="lesson-duration">40min</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="module-card">
+      <div class="module-header" onclick="this.parentElement.classList.toggle('open')">
+        <div>
+          <div class="module-level">Lv.4 — 创作</div>
+          <h3 class="module-title">剪辑叙事与节奏</h3>
+        </div>
+        <span class="module-toggle">+</span>
+      </div>
+      <div class="module-body">
+        <div class="module-body-inner">
+          <p class="module-desc">
+            剪辑不是拼素材，而是控制信息流。从蒙太奇理论到实战剪辑流程，用理性思维构建有感染力的叙事结构。声音设计是画面的一半。
+          </p>
+          <ul class="module-lessons">
+            <li>蒙太奇：从理论到实践的剪辑思维 <span class="lesson-duration">38min</span></li>
+            <li>剪辑节奏：信息密度与情感曲线 <span class="lesson-duration">35min</span></li>
+            <li>转场设计：从硬切到创意转场 <span class="lesson-duration">42min</span></li>
+            <li>声音设计：环境音、音效与配乐的逻辑 <span class="lesson-duration">45min</span></li>
+            <li>实战：用素材剪辑一支叙事短片 <span class="lesson-duration">60min</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="module-card">
+      <div class="module-header" onclick="this.parentElement.classList.toggle('open')">
+        <div>
+          <div class="module-level">Lv.5 — 精通</div>
+          <h3 class="module-title">电影级创作工作流</h3>
+        </div>
+        <span class="module-toggle">+</span>
+      </div>
+      <div class="module-body">
+        <div class="module-body-inner">
+          <p class="module-desc">
+            从前期策划到后期交付，完整电影级项目流程。镜头语言、场面调度、色彩分级、声音混音——用专业标准打造个人作品。本阶段将完成一个完整的毕业作品。
+          </p>
+          <ul class="module-lessons">
+            <li>前期策划：分镜脚本与拍摄计划 <span class="lesson-duration">45min</span></li>
+            <li>镜头语言：景别、角度与运动 <span class="lesson-duration">50min</span></li>
+            <li>场面调度：演员走位与机位设计 <span class="lesson-duration">42min</span></li>
+            <li>DIT与素材管理：专业工作流基础 <span class="lesson-duration">35min</span></li>
+            <li>色彩分级：达芬奇从入门到实战 <span class="lesson-duration">90min</span></li>
+            <li>声音混音与终混交付 <span class="lesson-duration">55min</span></li>
+            <li>毕业作品：从构思到成片全流程 <span class="lesson-duration">120min</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="pricing">
+  <div class="container">
+    <div class="page-header" style="padding: 40px 0 0;">
+      <div class="section-label">PRICING</div>
+      <h1>选择适合你的方案</h1>
+      <p>灵活的学习路径，按需选择。</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-name">单模块</div>
+        <div class="pricing-desc">选择感兴趣的一个阶段，针对性学习</div>
+        <div class="pricing-price">¥199 <small>/模块</small></div>
+        <div class="pricing-original"></div>
+        <ul class="pricing-features">
+          <li>所选模块全部课程</li>
+          <li>配套练习素材</li>
+          <li>无限回放</li>
+          <li>社群答疑</li>
+        </ul>
+        <a href="#" class="pricing-btn">立即购买</a>
+      </div>
+      <div class="pricing-card featured">
+        <div class="pricing-name">全套课程</div>
+        <div class="pricing-desc">五阶完整体系，从零基础到专业创作</div>
+        <div class="pricing-price">¥799 <small>/全套</small></div>
+        <div class="pricing-original">原价 ¥995</div>
+        <ul class="pricing-features">
+          <li>全部5个模块课程</li>
+          <li>全套练习素材 + 项目文件</li>
+          <li>无限回放 + 离线下载</li>
+          <li>专属学习群 + 老师答疑</li>
+          <li>作业点评与反馈</li>
+          <li>毕业证书</li>
+        </ul>
+        <a href="#" class="pricing-btn">立即购买</a>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-name">一对一辅导</div>
+        <div class="pricing-desc">个性化定制学习方案，直接对话指导</div>
+        <div class="pricing-price">¥2999</div>
+        <div class="pricing-original"></div>
+        <ul class="pricing-features">
+          <li>全套课程内容</li>
+          <li>4次一对一视频指导</li>
+          <li>个人作品集指导</li>
+          <li>优先答疑通道</li>
+          <li>创作项目全程跟盯</li>
+        </ul>
+        <a href="#" class="pricing-btn">预约咨询</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <ul class="footer-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="courses.html">课程</a></li>
+    <li><a href="articles.html">文章</a></li>
+    <li><a href="portfolio.html">作品</a></li>
+    <li><a href="about.html">关于</a></li>
+  </ul>
+  <p>⟡ 从物理到影像 · 北京大学物理学院 · 36岁重启人生</p>
+</footer>
+
+</body>
+</html>

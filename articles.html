@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文章 — 从物理到影像</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', 'Noto Serif SC', serif;
+  background: #0a0a0f;
+  color: #e8e6e3;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+::selection { background: #d4a853; color: #0a0a0f; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0a0f; }
+::-webkit-scrollbar-thumb { background: #d4a85333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #d4a85366; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+.noise {
+  position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat; background-size: 256px 256px;
+}
+.grid-bg {
+  position: fixed; inset: 0; z-index: 0;
+  background-image: linear-gradient(rgba(212,168,83,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(212,168,83,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 20px 32px;
+  display: flex; justify-content: space-between; align-items: center;
+  background: linear-gradient(180deg, rgba(10,10,15,0.95) 0%, transparent 100%);
+  backdrop-filter: blur(12px);
+}
+.nav-logo {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.1rem; font-weight: 700; color: #e8e6e3;
+  text-decoration: none; letter-spacing: 0.05em;
+}
+.nav-logo span { color: #d4a853; }
+.nav-links { display: flex; gap: 32px; list-style: none; }
+.nav-links a {
+  color: #8a8a92; text-decoration: none; font-size: 0.85rem;
+  font-weight: 400; letter-spacing: 0.05em; transition: color 0.3s;
+  position: relative;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -4px; left: 0;
+  width: 0; height: 1px; background: #d4a853; transition: width 0.3s;
+}
+.nav-links a:hover { color: #e8e6e3; }
+.nav-links a:hover::after { width: 100%; }
+.nav-links a.active { color: #d4a853; }
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+  position: relative; z-index: 2;
+  padding: 160px 0 60px;
+}
+.page-header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+  color: #d4a853; margin-bottom: 12px;
+}
+.page-header h1 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  line-height: 1.15;
+}
+.page-header p {
+  color: #8a8a92; font-size: 1rem; max-width: 420px;
+  font-weight: 300;
+}
+.filters {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.filter-tag {
+  padding: 6px 16px;
+  border: 1px solid #1a1a26;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  color: #8a8a92;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.filter-tag:hover { border-color: #d4a85333; color: #d4a853; }
+.filter-tag.active { background: #d4a853; border-color: #d4a853; color: #0a0a0f; }
+
+/* ===== ARTICLES ===== */
+.articles {
+  position: relative; z-index: 2;
+  padding: 0 0 120px;
+}
+.articles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-top: 32px;
+}
+.article-card {
+  background: #0f0f18;
+  border: 1px solid #1a1a26;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+.article-card:hover {
+  border-color: #d4a85333;
+  transform: translateY(-4px);
+}
+.article-thumb {
+  position: relative;
+  height: 200px;
+  background: linear-gradient(135deg, #12121a 0%, #1a1a26 100%);
+  overflow: hidden;
+}
+.article-thumb-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(212,168,83,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212,168,83,0.04) 1px, transparent 1px);
+  background-size: 12px 12px;
+}
+.article-thumb-diag {
+  position: absolute;
+  width: 150%; height: 150%;
+  top: 25%; left: -50%;
+  background: linear-gradient(90deg, transparent, rgba(212,168,83,0.04), transparent);
+  transform: rotate(45deg);
+  animation: slide 8s linear infinite;
+}
+@keyframes slide {
+  0% { transform: translateX(-10%) rotate(45deg); }
+  100% { transform: translateX(40%) rotate(45deg); }
+}
+.article-category {
+  position: absolute; top: 16px; left: 16px;
+  padding: 4px 12px;
+  background: rgba(10,10,15,0.8);
+  border: 1px solid #d4a85333;
+  border-radius: 100px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: #d4a853;
+}
+.article-body {
+  padding: 28px 24px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+.article-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.25rem; font-weight: 600;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+.article-excerpt {
+  color: #8a8a92;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin-bottom: 20px;
+  flex-grow: 1;
+}
+.article-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: #5a5a6a;
+}
+.article-read-more {
+  font-size: 0.75rem;
+  color: #d4a853;
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.article-card:hover .article-read-more { opacity: 1; }
+
+/* ===== PODCAST ===== */
+.notes {
+  position: relative; z-index: 2;
+  padding: 0 0 120px;
+}
+.notes-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 32px;
+}
+.notes-header h2 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.8rem; font-weight: 600;
+}
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.note-item {
+  padding: 24px;
+  background: #0f0f18;
+  border: 1px solid #1a1a26;
+  border-radius: 12px;
+  transition: border-color 0.3s;
+  cursor: pointer;
+}
+.note-item:hover { border-color: #d4a85333; }
+.note-category {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: #d4a853;
+  letter-spacing: 0.15em;
+  margin-bottom: 6px;
+}
+.note-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+.note-excerpt {
+  font-size: 0.85rem;
+  color: #8a8a92;
+  line-height: 1.6;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  position: relative; z-index: 2;
+  padding: 48px 24px;
+  border-top: 1px solid #1a1a26;
+  text-align: center;
+}
+footer p {
+  color: #4a4a5a; font-size: 0.8rem;
+  font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em;
+}
+.footer-links {
+  display: flex; justify-content: center; gap: 24px;
+  list-style: none; margin-bottom: 16px;
+}
+.footer-links a {
+  color: #6a6a7a; text-decoration: none; font-size: 0.8rem;
+  transition: color 0.3s;
+}
+.footer-links a:hover { color: #d4a853; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .articles-grid { grid-template-columns: 1fr; }
+  .notes-grid { grid-template-columns: 1fr; }
+  .page-header { padding: 140px 0 40px; }
+  .page-header-inner { align-items: start; }
+}
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+<div class="grid-bg"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo"><span>⟡</span> 物理影像</a>
+  <ul class="nav-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="courses.html">课程</a></li>
+    <li><a href="articles.html" class="active">文章</a></li>
+    <li><a href="portfolio.html">作品</a></li>
+    <li><a href="about.html">关于</a></li>
+  </ul>
+</nav>
+
+<section class="page-header">
+  <div class="container">
+    <div class="page-header-inner">
+      <div>
+        <div class="section-label">ARTICLES & NOTES</div>
+        <h1>文字思考与笔记</h1>
+        <p>用物理视角看影像创作，持续更新。理论思考+实战经验，文字沉淀思维。</p>
+      </div>
+      <div>
+        <div class="filters">
+          <span class="filter-tag active">全部</span>
+          <span class="filter-tag">理论</span>
+          <span class="filter-tag">技巧</span>
+          <span class="filter-tag">器材</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="articles">
+  <div class="container">
+    <div class="articles-grid">
+      <div class="article-card">
+        <div class="article-thumb">
+          <div class="article-thumb-grid"></div>
+          <div class="article-thumb-diag"></div>
+          <div class="article-category">基础理论</div>
+        </div>
+        <div class="article-body">
+          <h3 class="article-title">为什么学摄影要先懂光学？</h3>
+          <p class="article-excerpt">
+            大部分教程教你按按钮，不教你为什么要按那个按钮。当你理解了光的物理性质，一切参数都有了理由。光圈为什么控制景深？为什么不同焦段透视不同？...
+          </p>
+          <div class="article-meta">
+            <span>2024-03-15</span>
+            <a href="#" class="article-read-more">阅读 →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="article-card">
+        <div class="article-thumb">
+          <div class="article-thumb-grid"></div>
+          <div class="article-thumb-diag"></div>
+          <div class="article-category">认知升级</div>
+        </div>
+        <div class="article-body">
+          <h3 class="article-title">36岁从物理到自媒体：我的转行思考</h3>
+          <p class="article-excerpt">
+            六年本硕北大物理，结业之后为什么选择做自媒体做影像教学？这不是转行，这是另一种形式的"物理系毕业"。用物理思维理解影像创作...
+          </p>
+          <div class="article-meta">
+            <span>2024-02-28</span>
+            <a href="#" class="article-read-more">阅读 →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="article-card">
+        <div class="article-thumb">
+          <div class="article-thumb-grid"></div>
+          <div class="article-thumb-diag"></div>
+          <div class="article-category">实战技巧</div>
+        </div>
+        <div class="article-body">
+          <h3 class="article-title">手持稳定的七个物理技巧</h3>
+          <p class="article-excerpt">
+            稳定器不是万能的。什么时候该用三脚架？什么时候该用身体当三脚架？根据动量守恒原理，正确的呼吸和重心控制比器材更重要...
+          </p>
+          <div class="article-meta">
+            <span>2024-01-12</span>
+            <a href="#" class="article-read-more">阅读 →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="article-card">
+        <div class="article-thumb">
+          <div class="article-thumb-grid"></div>
+          <div class="article-thumb-diag"></div>
+          <div class="article-category">色彩科学</div>
+        </div>
+        <div class="article-body">
+          <h3 class="article-title">从物理学角度重新理解色温</h3>
+          <p class="article-excerpt">
+            为什么钨丝灯是暖色，蓝天是冷色？黑体辐射公式告诉你答案。白平衡真的是"校正色彩"吗？理解了这个底层原理，调色思路豁然开朗...
+          </p>
+          <div class="article-meta">
+            <span>2023-12-05</span>
+            <a href="#" class="article-read-more">阅读 →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="article-card">
+        <div class="article-thumb">
+          <div class="article-thumb-grid"></div>
+          <div class="article-thumb-diag"></div>
+          <div class="article-category">器材思考</div>
+        </div>
+        <div class="article-body">
+          <h3 class="article-title">全画幅真的比APS-C好吗？物理告诉你真相</h3>
+          <p class="article-excerpt">
+            传感器尺寸越大越好吗？这背后是信噪比、景深、衍射的权衡。作为物理系毕业的创作者，我告诉你什么时候该买大，什么时候够用...
+          </p>
+          <div class="article-meta">
+            <span>2023-11-18</span>
+            <a href="#" class="article-read-more">阅读 →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="article-card">
+        <div class="article-thumb">
+          <div class="article-thumb-grid"></div>
+          <div class="article-thumb-diag"></div>
+          <div class="article-category">剪辑思维</div>
+        </div>
+        <div class="article-body">
+          <h3 class="article-title">剪辑不是拼素材，是控制信息速率</h3>
+          <p class="article-excerpt">
+            为什么有些片子看着累，有些片子看着流畅？信息论角度分析剪辑节奏。观众的注意力带宽是有限的，合理安排信息密度才是好剪辑...
+          </p>
+          <div class="article-meta">
+            <span>2023-10-22</span>
+            <a href="#" class="article-read-more">阅读 →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="notes">
+  <div class="container">
+    <div class="notes-header">
+      <h2>随手笔记</h2>
+      <span class="section-label">瞬时思考</span>
+    </div>
+    <div class="notes-grid">
+      <div class="note-item">
+        <div class="note-category">光线</div>
+        <h4 class="note-title">影子比光更重要</h4>
+        <p class="note-excerpt">光影光影，影才是塑造形状的关键。很多人只关心光照在哪里，不关心影子落在哪里。</p>
+      </div>
+      <div class="note-item">
+        <div class="note-category">构图</div>
+        <h4 class="note-title">三分法不是规则，是结果</h4>
+        <p class="note-excerpt">三分法是让主体落在视觉重心上的一个特例，不是说所有构图都要套三分。</p>
+      </div>
+      <div class="note-item">
+        <div class="note-category">剪辑</div>
+        <h4 class="note-title">剪多比剪少难</h4>
+        <p class="note-excerpt">初学者总想把好东西都放进去，高手懂得为了整体牺牲局部。克制比展现需要更大勇气。</p>
+      </div>
+      <div class="note-item">
+        <div class="note-category">器材</div>
+        <h4 class="note-title">器材是身体的延伸</h4>
+        <p class="note-excerpt">了解器材的极限在哪里，才能在极限内创作。知道限制，才会有真正的自由。</p>
+      </div>
+      <div class="note-item">
+        <div class="note-category">创作</div>
+        <h4 class="note-title">理性拆解，感性表达</h4>
+        <p class="note-excerpt">用物理思维分析，用创作者的心感受。技术是骨架，情感是血肉。</p>
+      </div>
+      <div class="note-item">
+        <div class="note-category">学习</div>
+        <h4 class="note-title">从简单到复杂，不要反过来</h4>
+        <p class="note-excerpt">很多人一开始就追求复杂技法，忘记了基础才是金字塔的底座。慢慢来，比较快。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <ul class="footer-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="courses.html">课程</a></li>
+    <li><a href="articles.html">文章</a></li>
+    <li><a href="portfolio.html">作品</a></li>
+    <li><a href="about.html">关于</a></li>
+  </ul>
+  <p>⟡ 从物理到影像 · 北京大学物理学院 · 36岁重启人生</p>
+</footer>
+
+</body>
+</html>

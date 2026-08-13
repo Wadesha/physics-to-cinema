@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>从物理到影像 — 拍摄剪辑入门到精通</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', 'Noto Serif SC', serif;
+  background: #0a0a0f;
+  color: #e8e6e3;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+::selection { background: #d4a853; color: #0a0a0f; }
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0a0f; }
+::-webkit-scrollbar-thumb { background: #d4a85333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #d4a85366; }
+
+/* ===== UTILITY ===== */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #d4a853;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::before {
+  content: '';
+  width: 32px;
+  height: 1px;
+  background: #d4a85366;
+}
+.section-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+.section-sub {
+  font-size: 1rem;
+  color: #8a8a92;
+  max-width: 560px;
+  font-weight: 300;
+}
+
+/* ===== NOISE OVERLAY ===== */
+.noise {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* ===== GRID BACKGROUND ===== */
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(212, 168, 83, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 168, 83, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ===== CURSOR GLOW ===== */
+.cursor-glow {
+  position: fixed;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,168,83,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s;
+}
+
+/* ===== NAV ===== */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 20px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(180deg, rgba(10,10,15,0.95) 0%, transparent 100%);
+  backdrop-filter: blur(12px);
+}
+.nav-logo {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e8e6e3;
+  text-decoration: none;
+  letter-spacing: 0.05em;
+}
+.nav-logo span { color: #d4a853; }
+.nav-links { display: flex; gap: 32px; list-style: none; }
+.nav-links a {
+  color: #8a8a92;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  transition: color 0.3s;
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 0;
+  width: 0; height: 1px;
+  background: #d4a853;
+  transition: width 0.3s;
+}
+.nav-links a:hover { color: #e8e6e3; }
+.nav-links a:hover::after { width: 100%; }
+
+/* ===== HERO ===== */
+.hero {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 120px 24px 80px;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border: 1px solid #d4a85333;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  color: #d4a853;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.1em;
+  margin-bottom: 24px;
+}
+.hero-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #d4a853;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.hero h1 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(2.8rem, 7vw, 4.5rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 24px;
+}
+.hero h1 .accent { color: #d4a853; }
+.hero h1 .light { font-weight: 300; color: #8a8a92; }
+.hero p {
+  font-size: 1.05rem;
+  color: #8a8a92;
+  max-width: 480px;
+  margin-bottom: 40px;
+  font-weight: 300;
+  line-height: 1.8;
+}
+.hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s;
+  cursor: pointer;
+  border: none;
+}
+.btn-primary {
+  background: #d4a853;
+  color: #0a0a0f;
+}
+.btn-primary:hover {
+  background: #e0b95e;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(212,168,83,0.25);
+}
+.btn-outline {
+  background: transparent;
+  color: #e8e6e3;
+  border: 1px solid #e8e6e322;
+}
+.btn-outline:hover {
+  border-color: #d4a853;
+  color: #d4a853;
+  transform: translateY(-2px);
+}
+
+/* hero right - visual */
+.hero-visual {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.hero-frame {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 4/3;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #12121a;
+  border: 1px solid #1a1a26;
+}
+.hero-frame-inner {
+  position: absolute;
+  inset: 12px;
+  border: 1px solid #1a1a26;
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.hero-frame-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(212,168,83,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212,168,83,0.06) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.hero-frame-center {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+.hero-frame-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+.hero-frame-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: #5a5a6a;
+  letter-spacing: 0.2em;
+}
+.hero-frame-line {
+  position: absolute;
+  background: #d4a853;
+  opacity: 0.15;
+}
+.hero-frame-line.h { height: 1px; width: 60%; top: 50%; left: 20%; }
+.hero-frame-line.v { width: 1px; height: 60%; top: 20%; left: 50%; }
+
+/* ===== ABOUT ===== */
+.about {
+  position: relative;
+  z-index: 2;
+  padding: 120px 0;
+}
+.about-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: start;
+}
+.about-card {
+  background: #0f0f18;
+  border: 1px solid #1a1a26;
+  border-radius: 12px;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+}
+.about-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 2px;
+  background: linear-gradient(90deg, transparent, #d4a853, transparent);
+}
+.about-card h3 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.3rem;
+  margin-bottom: 16px;
+  color: #e8e6e3;
+}
+.about-card p {
+  color: #8a8a92;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+.about-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #d4a8530d;
+  border: 1px solid #d4a8531a;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #d4a853;
+  font-family: 'JetBrains Mono', monospace;
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.stat-item {
+  text-align: center;
+  padding: 24px 16px;
+  background: #0f0f18;
+  border: 1px solid #1a1a26;
+  border-radius: 8px;
+  transition: border-color 0.3s;
+}
+.stat-item:hover { border-color: #d4a85333; }
+.stat-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2rem;
+  font-weight: 500;
+  color: #d4a853;
+  display: block;
+}
+.stat-label {
+  font-size: 0.8rem;
+  color: #6a6a7a;
+  margin-top: 4px;
+}
+
+/* ===== COURSES ===== */
+.courses {
+  position: relative;
+  z-index: 2;
+  padding: 120px 0;
+  background: linear-gradient(180deg, transparent 0%, #0c0c14 50%, transparent 100%);
+}
+.courses-header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+.courses-header .section-label { justify-content: center; }
+.courses-header .section-label::before { display: none; }
+.courses-header .section-sub { margin: 0 auto; }
+.course-timeline {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.course-timeline::before {
+  content: '';
+  position: absolute;
+  left: 32px;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, #d4a85333, #d4a85366, #d4a853, #d4a85366, #d4a85333, transparent);
+}
+.course-item {
+  position: relative;
+  padding-left: 80px;
+  padding-bottom: 48px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.course-item.visible { opacity: 1; transform: translateY(0); }
+.course-item:last-child { padding-bottom: 0; }
+.course-dot {
+  position: absolute;
+  left: 24px;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #d4a853;
+  background: #0a0a0f;
+  transition: all 0.4s;
+}
+.course-item:hover .course-dot {
+  background: #d4a853;
+  box-shadow: 0 0 20px rgba(212,168,83,0.3);
+}
+.course-level {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: #d4a853;
+  letter-spacing: 0.15em;
+  margin-bottom: 4px;
+}
+.course-item-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.course-item-desc {
+  color: #8a8a92;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  max-width: 600px;
+}
+.course-item-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+.course-topic {
+  padding: 3px 10px;
+  background: #1a1a26;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #6a6a7a;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ===== SHOWREEL / PORTFOLIO ===== */
+.showreel {
+  position: relative;
+  z-index: 2;
+  padding: 120px 0;
+}
+.showreel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 48px;
+}
+.reel-card {
+  position: relative;
+  aspect-ratio: 16/9;
+  background: #0f0f18;
+  border: 1px solid #1a1a26;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.4s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.reel-card:hover {
+  border-color: #d4a85333;
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+}
+.reel-card-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #12121a 0%, #1a1a26 100%);
+}
+.reel-card-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(212,168,83,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212,168,83,0.04) 1px, transparent 1px);
+  background-size: 12px 12px;
+}
+.reel-card-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+.reel-card-icon {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+  opacity: 0.4;
+}
+.reel-card-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: #5a5a6a;
+  letter-spacing: 0.1em;
+}
+.reel-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10,10,15,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.reel-card:hover .reel-card-overlay { opacity: 1; }
+.reel-card-overlay span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: #d4a853;
+  letter-spacing: 0.1em;
+}
+
+/* ===== CTA ===== */
+.cta {
+  position: relative;
+  z-index: 2;
+  padding: 120px 0;
+  text-align: center;
+}
+.cta-box {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 64px 48px;
+  border: 1px solid #1a1a26;
+  border-radius: 16px;
+  background: radial-gradient(ellipse at center, #12121a 0%, #0a0a0f 100%);
+  position: relative;
+  overflow: hidden;
+}
+.cta-box::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(135deg, transparent 30%, #d4a85333, transparent 70%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.cta h2 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.cta p {
+  color: #8a8a92;
+  margin-bottom: 32px;
+  font-size: 1rem;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  position: relative;
+  z-index: 2;
+  padding: 48px 24px;
+  border-top: 1px solid #1a1a26;
+  text-align: center;
+}
+footer p {
+  color: #4a4a5a;
+  font-size: 0.8rem;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .hero-visual { display: none; }
+  .about-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .about-stats { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .showreel-grid { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .course-timeline::before { left: 20px; }
+  .course-item { padding-left: 56px; }
+  .course-dot { left: 12px; width: 16px; height: 16px; }
+  .cta-box { padding: 40px 24px; }
+  .about-card { padding: 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+<div class="grid-bg"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo"><span>⟡</span> 物理影像</a>
+  <ul class="nav-links">
+    <li><a href="about.html">关于</a></li>
+    <li><a href="courses.html">课程</a></li>
+    <li><a href="articles.html">文章</a></li>
+    <li><a href="portfolio.html">作品</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-badge">北大物理 · 影像创作者</div>
+      <h1>
+        从<span class="accent">物理</span>到<br>
+        <span class="light">影像</span>
+      </h1>
+      <p>
+        北大物理硕士，36岁，用理性拆解光影，用镜头重构世界。<br>
+        从零基础到专业级，带你系统掌握拍摄与剪辑的底层逻辑。
+      </p>
+      <div class="hero-actions">
+        <a href="#courses" class="btn btn-primary">探索课程 →</a>
+        <a href="#about" class="btn btn-outline">了解更多</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-frame">
+        <div class="hero-frame-inner">
+          <div class="hero-frame-grid"></div>
+          <div class="hero-frame-line h"></div>
+          <div class="hero-frame-line v"></div>
+          <div class="hero-frame-center">
+            <div class="hero-frame-icon">⬡</div>
+            <div class="hero-frame-text">FRAME · LIGHT · MOTION</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="container">
+    <div class="section-label">ABOUT</div>
+    <h2 class="section-title">理性与感性<br>的交汇点</h2>
+    <div class="about-content">
+      <div class="about-card">
+        <h3>北大物理 → 自媒体创作者</h3>
+        <p>
+          本科及硕士毕业于北京大学物理学院。六年的物理学训练，让我习惯用底层逻辑去理解世界——光线如何传播，镜头如何成像，人眼如何感知运动与色彩。
+        </p>
+        <p>
+          36岁，我选择把这些"硬核知识"翻译成每个人都能懂的影像语言。不是教参数，而是教思维方式——<strong>当你理解了光，你就理解了摄影</strong>。
+        </p>
+        <div>
+          <span class="about-tag">北京大学 物理学院</span>
+          <span class="about-tag">理论物理 硕士</span>
+          <span class="about-tag">6年影像教学</span>
+          <span class="about-tag">自媒体IP孵化</span>
+        </div>
+      </div>
+      <div class="about-stats">
+        <div class="stat-item">
+          <span class="stat-number">80+</span>
+          <span class="stat-label">课程视频</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">50K+</span>
+          <span class="stat-label">学员</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">12年</span>
+          <span class="stat-label">拍摄经验</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COURSES -->
+<section class="courses" id="courses">
+  <div class="container">
+    <div class="courses-header">
+      <div class="section-label">CURRICULUM</div>
+      <h2 class="section-title">从入门到精通</h2>
+      <p class="section-sub">系统化的课程体系，从最简单的手机拍摄到复杂的电影级叙事，每一步都有清晰的逻辑支撑。</p>
+    </div>
+    <div class="course-timeline">
+      <div class="course-item">
+        <div class="course-dot"></div>
+        <div class="course-level">Lv.1 — 入门</div>
+        <h3 class="course-item-title">手机也能拍大片</h3>
+        <p class="course-item-desc">不需要昂贵设备。从构图法则、光线判断到手机参数设置，用物理思维理解"拍清楚"和"拍好看"之间的区别。</p>
+        <div class="course-item-topics">
+          <span class="course-topic">构图基础</span>
+          <span class="course-topic">自然光利用</span>
+          <span class="course-topic">手机参数</span>
+          <span class="course-topic">稳定技巧</span>
+        </div>
+      </div>
+      <div class="course-item">
+        <div class="course-dot"></div>
+        <div class="course-level">Lv.2 — 进阶</div>
+        <h3 class="course-item-title">相机系统与曝光控制</h3>
+        <p class="course-item-desc">光圈、快门、ISO——不再死记硬背。从物理光学出发，理解曝光三角的内在关系，彻底告别"自动挡依赖"。</p>
+        <div class="course-item-topics">
+          <span class="course-topic">曝光三要素</span>
+          <span class="course-topic">测光模式</span>
+          <span class="course-topic">对焦系统</span>
+          <span class="course-topic">镜头选择</span>
+        </div>
+      </div>
+      <div class="course-item">
+        <div class="course-dot"></div>
+        <div class="course-level">Lv.3 — 核心</div>
+        <h3 class="course-item-title">光影与色彩科学</h3>
+        <p class="course-item-desc">色温、白平衡、色彩空间——这些不是玄学。从光的波粒二象性到人眼视觉感知，建立科学的色彩管理体系。</p>
+        <div class="course-item-topics">
+          <span class="course-topic">色温原理</span>
+          <span class="course-topic">色彩搭配</span>
+          <span class="course-topic">后期调色</span>
+          <span class="course-topic">LUT应用</span>
+        </div>
+      </div>
+      <div class="course-item">
+        <div class="course-dot"></div>
+        <div class="course-level">Lv.4 — 创作</div>
+        <h3 class="course-item-title">剪辑叙事与节奏</h3>
+        <p class="course-item-desc">剪辑不是拼素材，而是控制信息流。从蒙太奇理论到实战剪辑流程，用理性思维构建有感染力的叙事结构。</p>
+        <div class="course-item-topics">
+          <span class="course-topic">剪辑逻辑</span>
+          <span class="course-topic">节奏控制</span>
+          <span class="course-topic">转场设计</span>
+          <span class="course-topic">声音设计</span>
+        </div>
+      </div>
+      <div class="course-item">
+        <div class="course-dot"></div>
+        <div class="course-level">Lv.5 — 精通</div>
+        <h3 class="course-item-title">电影级创作工作流</h3>
+        <p class="course-item-desc">从前期策划到后期交付，完整电影级项目流程。镜头语言、场面调度、色彩分级、声音混音——用专业标准打造个人作品。</p>
+        <div class="course-item-topics">
+          <span class="course-topic">镜头语言</span>
+          <span class="course-topic">色彩分级</span>
+          <span class="course-topic">声音设计</span>
+          <span class="course-topic">项目实战</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SHOWREEL -->
+<section class="showreel" id="work">
+  <div class="container">
+    <div class="section-label">PORTFOLIO</div>
+    <h2 class="section-title">作品展示</h2>
+    <p class="section-sub">每一帧都是对光的理解。精选代表作品，从商业短片到个人创作。</p>
+    <div class="showreel-grid">
+      <div class="reel-card">
+        <div class="reel-card-bg"></div>
+        <div class="reel-card-grid"></div>
+        <div class="reel-card-content">
+          <div class="reel-card-icon">▶</div>
+          <div class="reel-card-label">城市光影</div>
+        </div>
+        <div class="reel-card-overlay"><span>播放 →</span></div>
+      </div>
+      <div class="reel-card">
+        <div class="reel-card-bg"></div>
+        <div class="reel-card-grid"></div>
+        <div class="reel-card-content">
+          <div class="reel-card-icon">▶</div>
+          <div class="reel-card-label">人物肖像</div>
+        </div>
+        <div class="reel-card-overlay"><span>播放 →</span></div>
+      </div>
+      <div class="reel-card">
+        <div class="reel-card-bg"></div>
+        <div class="reel-card-grid"></div>
+        <div class="reel-card-content">
+          <div class="reel-card-icon">▶</div>
+          <div class="reel-card-label">自然叙事</div>
+        </div>
+        <div class="reel-card-overlay"><span>播放 →</span></div>
+      </div>
+      <div class="reel-card">
+        <div class="reel-card-bg"></div>
+        <div class="reel-card-grid"></div>
+        <div class="reel-card-content">
+          <div class="reel-card-icon">▶</div>
+          <div class="reel-card-label">商业短片</div>
+        </div>
+        <div class="reel-card-overlay"><span>播放 →</span></div>
+      </div>
+      <div class="reel-card">
+        <div class="reel-card-bg"></div>
+        <div class="reel-card-grid"></div>
+        <div class="reel-card-content">
+          <div class="reel-card-icon">▶</div>
+          <div class="reel-card-label">实验影像</div>
+        </div>
+        <div class="reel-card-overlay"><span>播放 →</span></div>
+      </div>
+      <div class="reel-card">
+        <div class="reel-card-bg"></div>
+        <div class="reel-card-grid"></div>
+        <div class="reel-card-content">
+          <div class="reel-card-icon">▶</div>
+          <div class="reel-card-label">教学片段</div>
+        </div>
+        <div class="reel-card-overlay"><span>播放 →</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="contact">
+  <div class="container">
+    <div class="cta-box">
+      <h2>开始你的影像之路</h2>
+      <p>无论你是零基础小白，还是想系统提升的创作者，这里都有一条为你设计的路径。</p>
+      <a href="#" class="btn btn-primary">免费试听第一课 →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>⟡ 从物理到影像 · 北京大学物理学院 · 36岁重启人生</p>
+</footer>
+
+<script>
+// ===== CURSOR GLOW =====
+const glow = document.getElementById('cursorGlow');
+document.addEventListener('mousemove', (e) => {
+  glow.style.left = e.clientX + 'px';
+  glow.style.top = e.clientY + 'px';
+});
+
+// ===== SCROLL REVEAL =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.course-item').forEach(el => observer.observe(el));
+
+// ===== STATS COUNTER =====
+const statsSection = document.querySelector('.about-stats');
+const statNumbers = document.querySelectorAll('.stat-number');
+let counted = false;
+
+const countUp = (el, target) => {
+  const text = target;
+  const suffix = text.replace(/[\d]/g, '');
+  const num = parseInt(text.replace(/[^0-9]/g, ''));
+  if (isNaN(num)) { el.textContent = text; return; }
+
+  let current = 0;
+  const increment = Math.ceil(num / 60);
+  const timer = setInterval(() => {
+    current += increment;
+    if (current >= num) {
+      current = num;
+      clearInterval(timer);
+    }
+    el.textContent = current + suffix;
+  }, 20);
+};
+
+const statsObserver = new IntersectionObserver((entries) => {
+  if (entries[0].isIntersecting && !counted) {
+    counted = true;
+    statNumbers.forEach(el => {
+      const target = el.textContent;
+      el.textContent = '0';
+      setTimeout(() => countUp(el, target), 200);
+    });
+  }
+}, { threshold: 0.5 });
+
+statsObserver.observe(statsSection);
+</script>
+
+</body>
+</html>

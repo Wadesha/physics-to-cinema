@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>作品集 — 从物理到影像</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Inter','Noto Serif SC',serif;background:#0a0a0f;color:#e8e6e3;
+  line-height:1.7;overflow-x:hidden;
+}
+::selection{background:#d4a853;color:#0a0a0f}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0a0a0f}
+::-webkit-scrollbar-thumb{background:#d4a85333;border-radius:3px}
+
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+
+.noise{
+  position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:0.035;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat:repeat;background-size:256px 256px
+}
+.grid-bg{
+  position:fixed;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(212,168,83,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(212,168,83,0.03) 1px,transparent 1px);
+  background-size:60px 60px
+}
+
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:20px 32px;display:flex;justify-content:space-between;align-items:center;
+  background:linear-gradient(180deg,rgba(10,10,15,0.95) 0%,transparent 100%);
+  backdrop-filter:blur(12px)
+}
+.nav-logo{
+  font-family:'Noto Serif SC',serif;font-size:1.1rem;font-weight:700;
+  color:#e8e6e3;text-decoration:none;letter-spacing:0.05em
+}
+.nav-logo span{color:#d4a853}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{
+  color:#8a8a92;text-decoration:none;font-size:0.85rem;
+  letter-spacing:0.05em;transition:color 0.3s;position:relative
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;
+  width:0;height:1px;background:#d4a853;transition:width 0.3s
+}
+.nav-links a:hover{color:#e8e6e3}
+.nav-links a:hover::after{width:100%}
+.nav-links a.active{color:#d4a853}
+
+.page-header{
+  position:relative;z-index:2;padding:160px 0 60px
+}
+.page-header h1{
+  font-family:'Noto Serif SC',serif;
+  font-size:clamp(2.4rem,5vw,3.6rem);font-weight:900;line-height:1.15;margin-bottom:16px
+}
+.page-header .subtitle{
+  font-family:'JetBrains Mono',monospace;font-size:0.75rem;
+  letter-spacing:0.15em;color:#d4a853;margin-bottom:16px
+}
+.page-header p{color:#8a8a92;font-size:1.05rem;max-width:560px;font-weight:300}
+
+/* ===== GALLERY ===== */
+.gallery{position:relative;z-index:2;padding:0 0 120px}
+.gallery-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:40px}
+.gallery-item{
+  position:relative;border-radius:12px;overflow:hidden;cursor:pointer;
+  transition:all 0.4s;background:#0f0f18;border:1px solid #1a1a26
+}
+.gallery-item:hover{transform:translateY(-4px);border-color:#d4a85333}
+.gallery-item.wide{grid-column:span 2}
+.gallery-item.tall{grid-row:span 2}
+.gallery-thumb{
+  position:relative;aspect-ratio:16/9;overflow:hidden;background:linear-gradient(135deg,#12121a,#1a1a26)
+}
+.gallery-item.tall .gallery-thumb{aspect-ratio:3/4}
+.gallery-item.wide .gallery-thumb{aspect-ratio:21/9}
+.gallery-thumb-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(212,168,83,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(212,168,83,0.04) 1px,transparent 1px);
+  background-size:12px 12px
+}
+.gallery-thumb-overlay{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(10,10,15,0.4);opacity:0;transition:opacity 0.4s
+}
+.gallery-item:hover .gallery-thumb-overlay{opacity:1}
+.play-btn{
+  width:56px;height:56px;border-radius:50%;border:2px solid rgba(232,230,227,0.6);
+  display:flex;align-items:center;justify-content:center;color:#e8e6e3;
+  font-size:1.2rem;transition:all 0.3s;
+}
+.gallery-item:hover .play-btn{background:#d4a853;border-color:#d4a853;color:#0a0a0f}
+.gallery-info{padding:20px 24px}
+.gallery-cat{
+  font-family:'JetBrains Mono',monospace;font-size:0.65rem;
+  color:#d4a853;letter-spacing:0.15em;margin-bottom:4px
+}
+.gallery-info h3{font-family:'Noto Serif SC',serif;font-size:1.1rem;font-weight:600;margin-bottom:4px}
+.gallery-info p{color:#8a8a92;font-size:0.85rem;line-height:1.6}
+
+/* ===== TESTIMONIALS ===== */
+.testimonials{position:relative;z-index:2;padding:0 0 120px}
+.testimonials h2{
+  font-family:'Noto Serif SC',serif;font-size:1.8rem;font-weight:700;margin-bottom:48px
+}
+.test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.test-card{
+  padding:28px 24px;background:#0f0f18;border:1px solid #1a1a26;
+  border-radius:12px;transition:border-color 0.3s
+}
+.test-card:hover{border-color:#d4a85333}
+.test-card .quote{
+  color:#8a8a92;font-size:0.9rem;line-height:1.8;margin-bottom:16px;font-style:italic
+}
+.test-card .author{font-size:0.85rem;font-weight:500}
+.test-card .role{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:#5a5a6a;margin-top:2px}
+
+/* ===== FOOTER ===== */
+footer{position:relative;z-index:2;padding:48px 24px;border-top:1px solid #1a1a26;text-align:center}
+footer p{color:#4a4a5a;font-size:0.8rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.05em}
+.footer-links{display:flex;justify-content:center;gap:24px;list-style:none;margin-bottom:16px}
+.footer-links a{color:#6a6a7a;text-decoration:none;font-size:0.8rem;transition:color 0.3s}
+.footer-links a:hover{color:#d4a853}
+
+@media(max-width:768px){
+  .nav-links{display:none}
+  .gallery-grid{grid-template-columns:1fr}
+  .gallery-item.wide,.gallery-item.tall{grid-column:span 1;grid-row:span 1}
+  .gallery-item.tall .gallery-thumb{aspect-ratio:16/9}
+  .gallery-item.wide .gallery-thumb{aspect-ratio:16/9}
+  .test-grid{grid-template-columns:1fr}
+  .page-header{padding:140px 0 40px}
+}
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+<div class="grid-bg"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo"><span>⟡</span> 物理影像</a>
+  <ul class="nav-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="courses.html">课程</a></li>
+    <li><a href="articles.html">文章</a></li>
+    <li><a href="portfolio.html" class="active">作品</a></li>
+    <li><a href="about.html">关于</a></li>
+  </ul>
+</nav>
+
+<section class="page-header">
+  <div class="container">
+    <div class="subtitle">PORTFOLIO</div>
+    <h1>用镜头说话</h1>
+    <p>精选作品，从商业短片到个人创作，每一帧都带着对光的理解和对叙事的热爱。</p>
+  </div>
+</section>
+
+<section class="gallery">
+  <div class="container">
+    <div class="gallery-grid">
+      <div class="gallery-item wide">
+        <div class="gallery-thumb">
+          <div class="gallery-thumb-grid"></div>
+          <div class="gallery-thumb-overlay"><div class="play-btn">▶</div></div>
+        </div>
+        <div class="gallery-info">
+          <div class="gallery-cat">2024 · 精选短片</div>
+          <h3>城市呼吸 · City Breathing</h3>
+          <p>一座城市的24小时，从黎明到深夜。用延时摄影与运动镜头捕捉城市的光影节奏。配乐根据日光色温变化编排。</p>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <div class="gallery-thumb">
+          <div class="gallery-thumb-grid"></div>
+          <div class="gallery-thumb-overlay"><div class="play-btn">▶</div></div>
+        </div>
+        <div class="gallery-info">
+          <div class="gallery-cat">2023 · 人物专访</div>
+          <h3>手艺人</h3>
+          <p>记录一位制琴师的一天。自然光拍摄，极简布光，让画面和人物本身说话。</p>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <div class="gallery-thumb">
+          <div class="gallery-thumb-grid"></div>
+          <div class="gallery-thumb-overlay"><div class="play-btn">▶</div></div>
+        </div>
+        <div class="gallery-info">
+          <div class="gallery-cat">2024 · 商业合作</div>
+          <h3>品牌形象片 · 溯源</h3>
+          <p>为某科技品牌拍摄的年度形象片，使用电影镜头与色彩分级，强调产品与自然的联结。</p>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <div class="gallery-thumb">
+          <div class="gallery-thumb-grid"></div>
+          <div class="gallery-thumb-overlay"><div class="play-btn">▶</div></div>
+        </div>
+        <div class="gallery-info">
+          <div class="gallery-cat">2023 · 实验影像</div>
+          <h3>光迹 · Light Trails</h3>
+          <p>用长曝光和光绘创作的一系列实验影像，探索光作为"画笔"的可能性。</p>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <div class="gallery-thumb">
+          <div class="gallery-thumb-grid"></div>
+          <div class="gallery-thumb-overlay"><div class="play-btn">▶</div></div>
+        </div>
+        <div class="gallery-info">
+          <div class="gallery-cat">2024 · 纪录片</div>
+          <h3>小镇年味</h3>
+          <p>春节返乡期间拍摄的纪录短片，用最朴素的视角记录正在消失的年俗。全程手持拍摄。</p>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <div class="gallery-thumb">
+          <div class="gallery-thumb-grid"></div>
+          <div class="gallery-thumb-overlay"><div class="play-btn">▶</div></div>
+        </div>
+        <div class="gallery-info">
+          <div class="gallery-cat">2023 · 教学案例</div>
+          <h3>「光影实验」系列</h3>
+          <p>为了教学而拍摄的一系列案例短片，每期聚焦一个核心概念——丁达尔效应、二次曝光、色温对比等。</p>
+        </div>
+      </div>
+
+      <div class="gallery-item wide">
+        <div class="gallery-thumb">
+          <div class="gallery-thumb-grid"></div>
+          <div class="gallery-thumb-overlay"><div class="play-btn">▶</div></div>
+        </div>
+        <div class="gallery-info">
+          <div class="gallery-cat">2024 · 毕业作品</div>
+          <h3>「从物理到影像」同名短片</h3>
+          <p>用物理实验的视觉语言来讲述影像创作的故事。棱镜分光、波粒二象性、干涉条纹——这些物理概念变成了画面语言。为自己品牌拍摄的同名形象短片。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="testimonials">
+  <div class="container">
+    <h2>学员反馈</h2>
+    <div class="test-grid">
+      <div class="test-card">
+        <div class="quote">"以前学摄影总是记参数、背公式，但换了场景就不会用了。老师的物理思维让我真正理解了相机的工作原理，现在拍什么都心里有数。"</div>
+        <div class="author">林同学</div>
+        <div class="role">互联网产品经理 · 零基础学员</div>
+      </div>
+      <div class="test-card">
+        <div class="quote">"北大物理的背景太硬核了，能把色温讲到黑体辐射，能把曝光三角讲成物理公式。关键是，听完真的能用得上。"</div>
+        <div class="author">陈同学</div>
+        <div class="role">全职妈妈 · 入门到进阶</div>
+      </div>
+      <div class="test-card">
+        <div class="quote">"学完五阶课程，最大的收获不只是技术，而是一种看待影像的方式。现在每次按下快门前，我都会想：我到底想表达什么？"</div>
+        <div class="author">王同学</div>
+        <div class="role">独立创作者 · 全套课程学员</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <ul class="footer-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="courses.html">课程</a></li>
+    <li><a href="articles.html">文章</a></li>
+    <li><a href="portfolio.html">作品</a></li>
+    <li><a href="about.html">关于</a></li>
+  </ul>
+  <p>⟡ 从物理到影像 · 北京大学物理学院 · 36岁重启人生</p>
+</footer>
+
+</body>
+</html>
