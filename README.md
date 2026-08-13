@@ -1,6 +1,4 @@
-# 🔗 在线预览：https://your-username.github.io/physics-to-cinema/
-
-> 替换 `your-username` 为你的 GitHub 用户名，`physics-to-cinema` 为你的仓库名。
+# 🔗 在线预览：https://wadesha.github.io/physics-to-cinema/
 
 ---
 
